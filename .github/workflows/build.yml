@@ -1,0 +1,40 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Clean
+        run: dotnet clean
+
+      - name: Build Analyzers
+        run: |
+          cd ${{ github.workspace }}/DemoAnalyzers
+          dotnet pack -p:Version=1.0.${{ github.run_number }} -c Release -o ${{ github.workspace }}/packages
+
+      - name: Build Project with Analyzers
+        run: |
+          cd ${{ github.workspace }}/DemoProject
+          dotnet restore --source ${{ github.workspace }}/packages
+          dotnet build --no-restore --configuration Release /p:WarningsAsErrors=DEMO001,DEMO002,DEMO003
+        shell: pwsh
+        env:
+          MSBUILDDISABLENODEREUSE: 1
