@@ -20,21 +20,17 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
-
-      - name: Clean
-        run: dotnet clean
+          dotnet-version: 8.0.x
 
       - name: Build Analyzers
         run: |
-          cd ${{ github.workspace }}/DemoAnalyzers
-          dotnet pack -p:Version=1.0.${{ github.run_number }} -c Release -o ${{ github.workspace }}/packages
+          cd DemoAnalyzers
+          dotnet restore
+          dotnet build -c Release
+          dotnet pack -c Release -o ${{ github.workspace }}/packages --no-build
 
       - name: Build Project with Analyzers
         run: |
-          cd ${{ github.workspace }}/DemoProject
+          cd DemoProject
           dotnet restore --source ${{ github.workspace }}/packages
-          dotnet build --no-restore --configuration Release /p:WarningsAsErrors=DEMO001,DEMO002,DEMO003
-        shell: pwsh
-        env:
-          MSBUILDDISABLENODEREUSE: 1
+          dotnet build --no-restore -c Release -warnaserror
