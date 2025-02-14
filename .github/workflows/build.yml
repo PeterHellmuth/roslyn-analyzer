@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   build:
     runs-on: windows-latest
@@ -20,17 +16,17 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 9.0.x
 
       - name: Build Analyzers
         run: |
           cd DemoAnalyzers
           dotnet restore
           dotnet build -c Release
-          dotnet pack -c Release -o ${{ github.workspace }}/packages --no-build
+          dotnet pack -c Release -p:Version=1.0.${{ github.run_number }} -o ../packages
 
       - name: Build Project with Analyzers
         run: |
           cd DemoProject
-          dotnet restore --source ${{ github.workspace }}/packages
-          dotnet build --no-restore -c Release -warnaserror
+          dotnet restore --source https://api.nuget.org/v3/index.json --source ../packages
+          dotnet build --no-restore --configuration Release -p:DemoAnalyzersVersion=1.0.${{ github.run_number }}

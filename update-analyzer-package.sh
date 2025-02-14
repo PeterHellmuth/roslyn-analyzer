@@ -4,22 +4,19 @@
 cd DemoAnalyzers
 rm -rf bin obj
 
-# Build with explicit output
-dotnet build -c Release -p:OutputPath=./bin/Release/netstandard2.0/
-
-# Generate unique version
+# Generate semantic version (wildcard-friendly)
 VERSION=1.0.$(date +%s)
+echo "Building version: $VERSION"
 
-# Pack with explicit DLL reference
-dotnet pack -c Release \
-    -p:Version=$VERSION \
-    -p:PackageOutputPath=../packages \
-    -p:IncludeContentInPack=true \
-    -p:ContentTargetFolders=analyzers/dotnet/cs \
-    -p:NoBuild=true
+# Build & pack analyzers
+dotnet build -c Release
+dotnet pack -c Release -p:Version=$VERSION -o ../packages
 
-# Clean and update demo project
+# Update demo project (wildcard remains in .csproj)
 cd ../DemoProject
 rm -rf bin obj .vs .vscode
-dotnet remove package DemoAnalyzers
-dotnet add package DemoAnalyzers --version $VERSION --source ../packages
+
+# Force restore with latest version
+dotnet restore --source ../packages --force-evaluate
+
+echo "Updated to analyzer version $VERSION"

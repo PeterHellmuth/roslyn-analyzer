@@ -9,10 +9,15 @@ A minimal demo of custom Roslyn analyzers for team code conventions.
 
 ## Quick Start
 
-1. **Build Analyzers**
+**Prerequisites**
+
+Enable ".NET Compiler Platform SDK" in Visual Studio Installer under "Individual Components"
+
+1. **Build and Package Analyzers**
 
    ```bash
    cd DemoAnalyzers
+   dotnet build -c Release
    dotnet pack -c Release -o ../packages
 
    ```
@@ -20,7 +25,7 @@ A minimal demo of custom Roslyn analyzers for team code conventions.
 2. **Add Local Package Source**
 
    ```bash
-   cd DemoProject
+   cd ../DemoProject
    dotnet nuget add source ../packages -n local
 
    ```
