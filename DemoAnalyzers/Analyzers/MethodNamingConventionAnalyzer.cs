@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 
-namespace DemoAnalyzers
+namespace DemoAnalyzers.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MethodNamingConventionAnalyzer : DiagnosticAnalyzer
@@ -16,41 +16,44 @@ namespace DemoAnalyzers
 
         private static readonly DiagnosticDescriptor Rule = new(
             DiagnosticId, Title, MessageFormat, Category,
-            DiagnosticSeverity.Error, isEnabledByDefault: true,
-            description: "Method names should follow PascalCase convention.");
+            DiagnosticSeverity.Error, isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
             [Rule];
 
         public override void Initialize(AnalysisContext context)
         {
+            // Configure the analyzer to ignore generated code and enable concurrent execution
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeMethodDeclaration, SyntaxKind.MethodDeclaration);
-            context.RegisterSyntaxNodeAction(AnalyzeInvocationExpression, SyntaxKind.InvocationExpression);
+            
+            // Register a single syntax node action for method declarations and invocation expressions
+            context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.MethodDeclaration, SyntaxKind.InvocationExpression);
         }
 
-        private static void AnalyzeMethodDeclaration(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext context)
         {
-            var method = (MethodDeclarationSyntax)context.Node;
-            var methodName = method.Identifier.Text;
+            string? methodName = null;
+            Location? location = null;
 
-            if (!string.IsNullOrEmpty(methodName) && char.IsLower(methodName?[0] ?? '\0'))
+            // Check if the node is a method declaration or an invocation expression
+            // and extract the method name and location accordingly
+            if (context.Node is MethodDeclarationSyntax methodDeclaration)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(Rule, method.Identifier.GetLocation(), methodName));
+                methodName = methodDeclaration.Identifier.Text;
+                location = methodDeclaration.Identifier.GetLocation();
             }
-        }
+            else if (context.Node is InvocationExpressionSyntax invocation)
+            {
+                methodName = (invocation.Expression as MemberAccessExpressionSyntax)?.Name.Identifier.Text;
+                location = invocation.GetLocation();
+            }
 
-        private static void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
-        {
-            var invocation = (InvocationExpressionSyntax)context.Node;
-            var methodName = (invocation.Expression as MemberAccessExpressionSyntax)?.Name.Identifier.Text;
-
+            // If the method name is not null and starts with a lowercase letter, report a diagnostic
+            // This checks for PascalCase naming convention
             if (methodName != null && char.IsLower(methodName[0]))
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(Rule, invocation.GetLocation(), methodName));
+                context.ReportDiagnostic(Diagnostic.Create(Rule, location, methodName));
             }
         }
     }

@@ -12,6 +12,9 @@ echo "Building version: $VERSION"
 dotnet build -c Release
 dotnet pack -c Release -p:Version=$VERSION -o ../packages
 
+# Clean up old versions of the package
+find ../packages -name "DemoAnalyzers.*.nupkg" -not -name "DemoAnalyzers.$VERSION.nupkg" -delete
+
 # Update demo project (wildcard remains in .csproj)
 cd ../DemoProject
 rm -rf bin obj .vs .vscode

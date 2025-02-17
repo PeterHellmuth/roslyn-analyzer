@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-// DEMO003: Use structured logging templates instead of string interpolation
+
 namespace DemoProject.Services
 {
     public interface ILoggingService
@@ -17,6 +17,7 @@ namespace DemoProject.Services
             _logger = logger;
         }
 
+        // DEMO003: Use structured logging templates instead of string interpolation
         public void LogValid(string userName)
         {
             // Valid structured logging

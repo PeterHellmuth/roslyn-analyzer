@@ -9,12 +9,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DemoAnalyzers
+using DemoAnalyzers.Analyzers;
+
+namespace DemoAnalyzers.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MethodNamingConventionCodeFixProvider)), Shared]
     public class MethodNamingConventionCodeFixProvider : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => ImmutableArray.Create(MethodNamingConventionAnalyzer.DiagnosticId);
+        public sealed override ImmutableArray<string> FixableDiagnosticIds => [MethodNamingConventionAnalyzer.DiagnosticId];
 
         public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

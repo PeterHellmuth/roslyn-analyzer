@@ -4,6 +4,6 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-DEMO001  |  Naming  |  Error | Method names should follow PascalCase convention.
+DEMO001  |  Naming  |  Error | Method names should follow PascalCase convention
 DEMO002  | Usage |  Error    | Replace DateTime.Now with DateTime.UtcNow
-DEMO003  |  Logging   | Error | Use structured logging templates instead of string interpolation (https://learn.microsoft.com/en-us/dotnet/core/extensions/logging-library-authors#avoid-string-interpolation-in-logging)
+DEMO003  |  Logging   | Error | Use structured logging templates instead of string interpolation
