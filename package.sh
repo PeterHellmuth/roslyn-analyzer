@@ -4,9 +4,12 @@
 cd DemoAnalyzers
 rm -rf bin obj
 
-# Generate semantic version (wildcard-friendly)
-VERSION=1.0.$(date +%s)
+# Set a fixed version number
+VERSION=1.0.0
 echo "Building version: $VERSION"
+
+# Delete the existing package if it exists
+rm -f ../packages/DemoAnalyzers.$VERSION.nupkg
 
 # Build & pack analyzers
 dotnet build -c Release
@@ -14,6 +17,9 @@ dotnet pack -c Release -p:Version=$VERSION -o ../packages
 
 # Clean up old versions of the package
 find ../packages -name "DemoAnalyzers.*.nupkg" -not -name "DemoAnalyzers.$VERSION.nupkg" -delete
+
+# Clear the NuGet cache
+dotnet nuget locals all --clear
 
 # Update demo project (wildcard remains in .csproj)
 cd ../DemoProject

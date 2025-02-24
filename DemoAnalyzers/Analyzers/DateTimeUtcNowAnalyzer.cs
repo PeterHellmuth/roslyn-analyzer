@@ -9,7 +9,7 @@ namespace DemoAnalyzers.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DateTimeUtcNowAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DEMO001";
+        public const string DiagnosticId = "DEMO002";
         private static readonly LocalizableString Title = "Use UtcNow instead of Now";
         private static readonly LocalizableString MessageFormat = "Replace DateTime.Now with DateTime.UtcNow";
         private const string Category = "Usage";

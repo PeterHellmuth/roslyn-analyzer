@@ -5,20 +5,20 @@
         static void Main()
         {
             // DEMO002: Use UtcNow instead of Now
-            var currentDate = DateTime.Now; // This should trigger a diagnostic
+            var currentDate = DateTime.Now;
 
             // Examples of null operators
             string? nullableString = null;
-            string nonNullableString = "Hello";
+            string nonNullableString = string.Empty;
 
             // DEMO003: Null-coalescing operator (??)
-            var result = nullableString ?? "Default value"; // This should trigger a diagnostic
+            var result = nullableString ?? "Default value";
 
             // DEMO004: Null-coalescing assignment operator (??=)
-            nullableString ??= "Assigned value"; // This should trigger a diagnostic
+            nullableString ??= "Assigned value";
 
             // DEMO005: Null-forgiving operator (!)
-            var length = nullableString!.Length; // This should trigger a diagnostic
+            var length = nullableString!.Length;
         }
     }
 }
