@@ -9,7 +9,7 @@ namespace DemoAnalyzers.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class DateTimeUtcNowAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DEMO002";
+        public const string DiagnosticId = "DEMO001";
         private static readonly LocalizableString Title = "Use UtcNow instead of Now";
         private static readonly LocalizableString MessageFormat = "Replace DateTime.Now with DateTime.UtcNow";
         private const string Category = "Usage";
@@ -25,8 +25,8 @@ namespace DemoAnalyzers.Analyzers
         {
             // Configure the analyzer to ignore generated code and enable concurrent execution
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            // Enable concurrent execution to allow multiple threads to analyze code simultaneously
             context.EnableConcurrentExecution();
+            
             // Register a syntax node action to analyze member access expressions
             // This will check for DateTime.Now usage
             context.RegisterSyntaxNodeAction(AnalyzeMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
