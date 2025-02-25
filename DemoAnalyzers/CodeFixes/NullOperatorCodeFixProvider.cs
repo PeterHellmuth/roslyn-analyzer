@@ -58,30 +58,65 @@ namespace DemoAnalyzers.CodeFixes
         {
             // Find the variable declaration for the target expression
             var document = context.Document;
+            // Get the semantic model for the document
             var semanticModel = await document.GetSemanticModelAsync(context.CancellationToken);
             
             // Check if the target expression is a local variable
             if (targetExpression is IdentifierNameSyntax identifier &&
                 semanticModel.GetSymbolInfo(identifier).Symbol is ILocalSymbol localSymbol)
             {
-                // Find the variable declaration and check if it's a nullable reference type
+                // Find the variable declaration for the local symbol
                 var declaration = await FindVariableDeclarationAsync(document, localSymbol);
                 
-                // Register a code fix if the variable is a nullable reference type
-                if (declaration != null && IsNullableReferenceType(declaration))
+                if (declaration != null)
                 {
+                    // Check if the variable needs fixing (is nullable and not initialized to string.Empty)
+                    var needsVariableFix = IsNullableReferenceType(declaration) && 
+                        (declaration.Initializer == null || 
+                         declaration.Initializer.Value.ToString() != "string.Empty");
+
+                    // Register the code fix for the variable declaration
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             title: GetFixTitle(operationNode),
-                            createChangedDocument: c => ApplyCompleteFix(
-                                document, 
-                                declaration, 
-                                operationNode, 
-                                c),
+                            createChangedDocument: c => needsVariableFix 
+                                ? ApplyCompleteFix(document, declaration, operationNode, c)
+                                : ApplyOperatorFix(document, operationNode, c),
                             equivalenceKey: GetEquivalenceKey(operationNode)),
                         context.Diagnostics);
                 }
             }
+        }
+
+        private async Task<Document> ApplyOperatorFix(
+            Document document,
+            SyntaxNode operationNode,
+            CancellationToken cancellationToken)
+        {
+            // Apply the fix for the null operator
+            var root = await document.GetSyntaxRootAsync(cancellationToken);
+            if (root == null) return document;
+            
+            // Create a syntax editor to modify the syntax tree
+            var editor = new SyntaxEditor(root, document.Project.Solution.Workspace.Services);
+
+            // Replace the operator with the new expression
+            var replacement = GetReplacementNode(operationNode);
+
+            if (replacement is IfStatementSyntax ifStatement)
+            {
+                // Replace the operator with the new if statement
+                editor.ReplaceNode(operationNode.Parent!, ifStatement);
+            }
+            else
+            {
+                // Replace the operator with the new expression
+                editor.ReplaceNode(operationNode, replacement);
+            }
+
+            // Apply the changes to the syntax tree
+            var newRoot = editor.GetChangedRoot();
+            return document.WithSyntaxRoot(newRoot);
         }
 
         private string GetFixTitle(SyntaxNode node) => node switch
@@ -199,41 +234,35 @@ namespace DemoAnalyzers.CodeFixes
             };
         }
 
-        private SyntaxNode GetReplacementNode(SyntaxNode originalNode)
+        private SyntaxNode GetReplacementNode(SyntaxNode originalNode) => originalNode switch
         {
-            return originalNode switch
-            {
-                // For ?? operator: keep left side
-                BinaryExpressionSyntax coalesce => coalesce.Left
-                    .WithTriviaFrom(coalesce),
-                
-                // For ??= operator: replace with if statement
-                AssignmentExpressionSyntax assignment => SyntaxFactory.IfStatement(
-                    condition: SyntaxFactory.InvocationExpression(
+            // Remove null coallescing operator
+            BinaryExpressionSyntax coalesce => coalesce.Left.WithTriviaFrom(coalesce),
+            
+            // Remove null coallescing assignment operator
+            AssignmentExpressionSyntax assignment when assignment.IsKind(SyntaxKind.CoalesceAssignmentExpression) => 
+                SyntaxFactory.IfStatement(
+                    SyntaxFactory.InvocationExpression(
                         SyntaxFactory.MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
                             SyntaxFactory.IdentifierName("string"),
                             SyntaxFactory.IdentifierName("IsNullOrEmpty")),
                         SyntaxFactory.ArgumentList(
                             SyntaxFactory.SingletonSeparatedList(
-                                SyntaxFactory.Argument(assignment.Left)))),
-                    statement: SyntaxFactory.Block(
+                                SyntaxFactory.Argument(assignment.Left.WithoutTrivia())))),
+                    SyntaxFactory.Block(
                         SyntaxFactory.ExpressionStatement(
                             SyntaxFactory.AssignmentExpression(
                                 SyntaxKind.SimpleAssignmentExpression,
-                                assignment.Left,
-                                assignment.Right))))
-                    .WithLeadingTrivia(originalNode.GetLeadingTrivia())
-                    .WithTrailingTrivia(originalNode.GetTrailingTrivia()),
-                
-                // For ! operator: keep operand
-                PostfixUnaryExpressionSyntax postfix => postfix.Operand
-                    .WithTriviaFrom(postfix),
-                
-                _ => originalNode
-            };
-        }
-
+                                assignment.Left.WithoutTrivia(),
+                                assignment.Right.WithoutTrivia()))))
+                    .WithTriviaFrom(originalNode),
+            
+            // Replace the null forgiving operator
+            PostfixUnaryExpressionSyntax postfix => postfix.Operand.WithTriviaFrom(postfix),
+            
+            _ => originalNode
+        };
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
     }
 }

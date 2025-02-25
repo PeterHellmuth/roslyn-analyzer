@@ -29,18 +29,16 @@ namespace DemoAnalyzers.CodeFixes
 
             // Get the first diagnostic from the context
             var diagnostic = context.Diagnostics.First();
+            
             // Get the span of the diagnostic location
-            // This is the location of the string interpolation in the code
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            // Find the token at the start of the diagnostic span
-            // and get its parent syntax node
+            // Find the token at the start of the diagnostic span and get its parent syntax node
             var parent = root.FindToken(diagnosticSpan.Start).Parent;
             if (parent == null)
                 return;
 
             // Find the first InterpolatedStringExpressionSyntax ancestor of the parent node
-            // This is the string interpolation that needs to be converted
             var interpolatedString = parent.AncestorsAndSelf().OfType<InterpolatedStringExpressionSyntax>().First();
 
             // Register a code fix action to convert the string interpolation to structured logging

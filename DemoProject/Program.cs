@@ -5,7 +5,7 @@
         static void Main()
         {
             // DEMO002: Use UtcNow instead of Now
-            var currentDate = DateTime.Now;
+            var currentDate = DateTime.UtcNow;
 
             // Examples of null operators
             string? nullableString = null;

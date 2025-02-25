@@ -9,7 +9,7 @@ namespace DemoAnalyzers.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StructuredLoggingAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DEMO003";
+        public const string DiagnosticId = "DEMO002";
         private static readonly LocalizableString Title = "Structured logging required";
         private static readonly LocalizableString MessageFormat = "Use structured logging templates instead of string interpolation";
 

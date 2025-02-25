@@ -9,7 +9,7 @@ namespace DemoAnalyzers.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class NullOperatorsAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "DEMO001";
+        public const string DiagnosticId = "DEMO003";
 
         private static readonly LocalizableString Title = "Null operator usage detected";
         private static readonly LocalizableString MessageFormat = "Null operator '{0}' is used. Use a non-nullable value instead.";

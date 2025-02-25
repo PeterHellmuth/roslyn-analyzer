@@ -5,8 +5,8 @@ namespace DemoProject.Services
 {
     public interface ILoggingService
     {
-        void LogValid(string userName);
-        void LogInvalid(string userName);
+        void LogValid(string userName, string action);
+        void LogInvalid(string userName, string action);
     }
     public class LoggingService : ILoggingService
     {
@@ -18,16 +18,16 @@ namespace DemoProject.Services
         }
 
         // DEMO003: Use structured logging templates instead of string interpolation
-        public void LogValid(string userName)
+        public void LogValid(string userName, string action)
         {
             // Valid structured logging
-            _logger.LogInformation("User {userName} logged in", userName);
+            _logger.LogInformation("User {userName} performed {action}", userName, action);
         }
 
-        public void LogInvalid(string userName)
+        public void LogInvalid(string userName, string action)
         {
             // Invalid interpolated string
-            _logger.LogInformation($"User {userName} logged in"); 
+            _logger.LogInformation($"User {userName} performed {action}"); 
         }
     }
 }
