@@ -217,9 +217,9 @@ namespace DemoAnalyzers.CodeFixes
             {
                 // Use right-hand value from ?? operator
                 BinaryExpressionSyntax binary => binary.Right,
-                
+
                 // Use string.Empty for ??= operator
-                AssignmentExpressionSyntax assignment => SyntaxFactory.ParseExpression("string.Empty"),
+                AssignmentExpressionSyntax => SyntaxFactory.ParseExpression("string.Empty"),
                 
                 // For null forgiving operator, use type-specific default
                 PostfixUnaryExpressionSyntax => type switch

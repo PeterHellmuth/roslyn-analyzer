@@ -21,7 +21,7 @@ find ../packages -name "DemoAnalyzers.*.nupkg" -not -name "DemoAnalyzers.$VERSIO
 # Clear the NuGet cache
 dotnet nuget locals all --clear
 
-# Update demo project (wildcard remains in .csproj)
+# Update demo project
 cd ../DemoProject
 rm -rf bin obj .vs .vscode
 

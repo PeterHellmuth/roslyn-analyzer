@@ -5,7 +5,7 @@
         static void Main()
         {
             // DEMO002: Use UtcNow instead of Now
-            var currentDate = DateTime.UtcNow;
+            var currentDate = DateTime.Now;
 
             // Examples of null operators
             string? nullableString = null;
@@ -15,7 +15,7 @@
             var result = nullableString ?? "Default value";
 
             // DEMO004: Null-coalescing assignment operator (??=)
-            nullableString ??= "Assigned value";
+            nullableString ??= "Default value";
 
             // DEMO005: Null-forgiving operator (!)
             var length = nullableString!.Length;
