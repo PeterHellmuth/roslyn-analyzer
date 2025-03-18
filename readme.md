@@ -49,4 +49,8 @@ Sample GitHub Actions workflow included (.github/workflows/build.yml).
 
 - [.NET Compiler Platform SDK Documentation](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/)
 - [Microsoft - Write your first analyzer and code fix tutorial](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/tutorials/how-to-write-csharp-analyzer-code-fix)
+- [StyleCop](https://marketplace.visualstudio.com/items?itemName=ChrisDahlberg.StyleCop)
 - [Roslynator](https://github.com/dotnet/roslynator)
+- [AsyncFixer](https://github.com/semihokur/AsyncFixer)
+- [Microsoft.CodeAnalysis (XUnit, NUnit, MSTest)](https://www.nuget.org/packages?q=microsoft.codeanalysis.testing&includeComputedFrameworks=true&prerel=true&sortby=relevance)
+- [RoslynTestKit](https://github.com/cezarypiatek/RoslynTestKit)

@@ -36,24 +36,28 @@ namespace DemoAnalyzers.Analyzers
         private static void AnalyzeInvocation(SyntaxNodeAnalysisContext context)
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
-            var methodName = (invocation.Expression as MemberAccessExpressionSyntax)?.Name.Identifier.Text;
+            
+            // Only analyze method calls with member access (e.g., logger.LogInformation)
+            if (invocation.Expression is not MemberAccessExpressionSyntax memberAccess)
+                return;
 
-            // Check if the method name starts with "Log" (e.g., LogInformation, LogError)
-            if (methodName?.StartsWith("Log") == true && 
-            context.SemanticModel.GetSymbolInfo(invocation).Symbol is IMethodSymbol)
-            {
-            // Iterate through all arguments to check for string interpolation
+            var methodName = memberAccess.Name.Identifier.Text;
+            if (!methodName.StartsWith("Log"))
+                return;
+
+            // Verify it's a method symbol
+            if (context.SemanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol)
+                return;
+
             foreach (var argument in invocation.ArgumentList.Arguments)
             {
-                var argumentType = context.SemanticModel.GetTypeInfo(argument.Expression).Type;
-                if (argumentType?.SpecialType == SpecialType.System_String &&
-                argument.Expression is InterpolatedStringExpressionSyntax)
+                var typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
+                if (typeInfo.Type is { SpecialType: SpecialType.System_String } && 
+                    argument.Expression is InterpolatedStringExpressionSyntax)
                 {
-                // Report a diagnostic if string interpolation is used
-                context.ReportDiagnostic(
-                    Diagnostic.Create(Rule, argument.Expression.GetLocation()));
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(Rule, argument.Expression.GetLocation()));
                 }
-            }
             }
         }
     }
