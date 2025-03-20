@@ -5,7 +5,7 @@ cd DemoAnalyzers
 rm -rf bin obj
 
 # Set a fixed version number
-VERSION=1.0.0
+VERSION=$(grep -oPm1 "(?<=<Version>)[^<]+" DemoAnalyzers.csproj)
 echo "Building version: $VERSION"
 
 # Delete the existing package if it exists

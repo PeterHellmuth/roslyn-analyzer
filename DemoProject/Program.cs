@@ -4,20 +4,20 @@
     {
         static void Main()
         {
-            // DEMO002: Use UtcNow instead of Now
+            // DEMO001: Use UtcNow instead of Now
             var currentDate = DateTime.Now;
 
             // Examples of null operators
             string? nullableString = null;
             string nonNullableString = string.Empty;
 
-            // DEMO003: Null-coalescing operator (??)
+            // DEMO002: Null-coalescing operator (??)
             var result = nullableString ?? "Default value";
 
-            // DEMO004: Null-coalescing assignment operator (??=)
+            // DEMO002: Null-coalescing assignment operator (??=)
             nullableString ??= "Default value";
 
-            // DEMO005: Null-forgiving operator (!)
+            // DEMO002: Null-forgiving operator (!)
             var length = nullableString!.Length;
         }
     }
