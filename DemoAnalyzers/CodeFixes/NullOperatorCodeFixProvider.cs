@@ -15,9 +15,9 @@ using DemoAnalyzers.Analyzers;
 namespace DemoAnalyzers.CodeFixes
     {
     [ExportCodeFixProvider(LanguageNames.CSharp), Shared]
-    public class NullOperatorCodeFixProvider : CodeFixProvider
+    public sealed class NullOperatorCodeFixProvider : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => [NullOperatorsAnalyzer.DiagnosticId];
+        public override ImmutableArray<string> FixableDiagnosticIds => [NullOperatorsAnalyzer.DiagnosticId];
 
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
@@ -236,10 +236,10 @@ namespace DemoAnalyzers.CodeFixes
 
         private SyntaxNode GetReplacementNode(SyntaxNode originalNode) => originalNode switch
         {
-            // Remove null coallescing operator
+            // Replace null coalescing operator (??) with the left-hand operand
             BinaryExpressionSyntax coalesce => coalesce.Left.WithTriviaFrom(coalesce),
             
-            // Remove null coallescing assignment operator
+            // Replace null coalescing assignment operator (??=) with an equivalent if-statement
             AssignmentExpressionSyntax assignment when assignment.IsKind(SyntaxKind.CoalesceAssignmentExpression) => 
                 SyntaxFactory.IfStatement(
                     SyntaxFactory.InvocationExpression(
@@ -256,11 +256,12 @@ namespace DemoAnalyzers.CodeFixes
                                 SyntaxKind.SimpleAssignmentExpression,
                                 assignment.Left.WithoutTrivia(),
                                 assignment.Right.WithoutTrivia()))))
-                    .WithTriviaFrom(originalNode),
+                .WithTriviaFrom(originalNode),
             
-            // Replace the null forgiving operator
+            // Replace null-forgiving operator (!) with the operand, preserving trivia
             PostfixUnaryExpressionSyntax postfix => postfix.Operand.WithTriviaFrom(postfix),
             
+            // Default case: return the original node unchanged
             _ => originalNode
         };
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;

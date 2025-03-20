@@ -14,13 +14,13 @@ using DemoAnalyzers.Analyzers;
 namespace DemoAnalyzers.CodeFixes
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StructuredLoggingCodeFixProvider)), Shared]
-    public class StructuredLoggingCodeFixProvider : CodeFixProvider
+    public sealed class StructuredLoggingCodeFixProvider : CodeFixProvider
     {
-        public sealed override ImmutableArray<string> FixableDiagnosticIds => [StructuredLoggingAnalyzer.DiagnosticId];
+        public override ImmutableArray<string> FixableDiagnosticIds => [StructuredLoggingAnalyzer.DiagnosticId];
 
-        public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
-        public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             // Get the syntax root of the document
             var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);

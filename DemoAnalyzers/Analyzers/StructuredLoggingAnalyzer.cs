@@ -49,14 +49,19 @@ namespace DemoAnalyzers.Analyzers
             if (context.SemanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol)
                 return;
 
+            // Iterate through the arguments of the method call
             foreach (var argument in invocation.ArgumentList.Arguments)
             {
+                // Get the type information of the argument
                 var typeInfo = context.SemanticModel.GetTypeInfo(argument.Expression);
+
+                // Check if the argument is a string and an interpolated string expression
                 if (typeInfo.Type is { SpecialType: SpecialType.System_String } && 
                     argument.Expression is InterpolatedStringExpressionSyntax)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(Rule, argument.Expression.GetLocation()));
+                    break;
                 }
             }
         }

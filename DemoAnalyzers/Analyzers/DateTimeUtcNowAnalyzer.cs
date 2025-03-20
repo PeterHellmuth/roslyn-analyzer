@@ -36,7 +36,11 @@ namespace DemoAnalyzers.Analyzers
         {
             // Cast to member access expression (e.g., DateTime.Now)
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
-            // Check if the member access is for DateTime.Now
+            
+            // A MemberAccessExpressionSyntax represents an expression like "DateTime.Now".
+            // It has two main parts:
+            // - The "Expression" property (e.g., "DateTime"), which can be another expression or an identifier.
+            // - The "Name" property (e.g., "Now"), which is the member being accessed.
             if (memberAccess.Expression is IdentifierNameSyntax identifier &&
                 identifier.Identifier.Text == "DateTime" &&
                 memberAccess.Name.Identifier.Text == "Now")
